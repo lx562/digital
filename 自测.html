@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>数字化意识自测 · 分组助手</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f5fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px 10px;
+        }
+        .card {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,20,40,0.12);
+            padding: 30px 25px;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #0b3550;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .subhead {
+            color: #2d4e6e;
+            font-size: 1rem;
+            border-left: 4px solid #4a90e2;
+            padding-left: 16px;
+            margin: 8px 0 25px 0;
+            background: #eef4fa;
+            border-radius: 0 20px 20px 0;
+            line-height: 1.5;
+            padding: 12px 20px;
+        }
+        .question-item {
+            background: #f9fcff;
+            border-radius: 24px;
+            padding: 20px 25px;
+            border: 1px solid #dde9f2;
+            margin-bottom: 20px;
+        }
+        .question-text {
+            font-weight: 600;
+            color: #11334d;
+            margin-bottom: 18px;
+            line-height: 1.4;
+            font-size: 1.1rem;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: white;
+            padding: 10px 18px;
+            border-radius: 30px;
+            border: 1px solid #cbd6e3;
+            font-size: 1rem;
+            color: #1d3a5a;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .option-label:hover {
+            background: #e3efff;
+            border-color: #4a90e2;
+        }
+        .option-label input[type="radio"] {
+            accent-color: #1f6fb0;
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .sit-row {
+            background: #f1f7fe;
+            border-radius: 28px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        .sit-text {
+            font-weight: 700;
+            color: #0e3b5e;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .sit-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 35px 0 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            border: none;
+            background: #1e5f9e;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 16px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(25, 85, 150, 0.3);
+            transition: 0.15s;
+            min-width: 200px;
+            letter-spacing: 0.5px;
+        }
+        .btn.reset {
+            background: #e0e9f2;
+            color: #1e3f5e;
+            box-shadow: none;
+        }
+        .btn:hover {
+            background: #134b82;
+            transform: scale(1.02);
+        }
+        .btn.reset:hover {
+            background: #cbdae9;
+        }
+        .result-box {
+            background: linear-gradient(145deg, #eef3fc, #ffffff);
+            border-radius: 40px;
+            padding: 25px 25px;
+            margin-top: 25px;
+            border: 2px solid #c9ddec;
+            box-shadow: inset 0 1px 4px #ffffff, 0 10px 20px rgba(0,30,50,0.1);
+        }
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0b3550;
+            margin-bottom: 12px;
+        }
+        .group-badge {
+            display: inline-block;
+            background: #4a90e2;
+            color: white;
+            font-weight: 700;
+            font-size: 2rem;
+            padding: 10px 35px;
+            border-radius: 60px;
+            margin: 10px 0 20px;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 0 #23558b;
+        }
+        .scores-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-around;
+            margin: 25px 0 5px;
+        }
+        .score-item {
+            background: #daeaf9;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-weight: 600;
+            color: #063155;
+            min-width: 130px;
+            text-align: center;
+            box-shadow: inset 0 1px 5px #b1c9e0;
+        }
+        .score-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-left: 8px;
+            color: #003057;
+        }
+        .footnote {
+            color: #3a5b7a;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            text-align: center;
+            border-top: 1px dashed #b8cde0;
+            padding-top: 18px;
+        }
+        .required-star {
+            color: #c7421a;
+            font-size: 1.2rem;
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🧑‍🏫 教师数字化意识 · 自测分组</h1>
+        <div class="subhead">
+            根据《教师数字素养》行业标准设计 · 完成12道量表题 + 2个情境题，系统将自动分析您三个维度的得分，并建议您加入得分最高的小组参与课堂活动。
+        </div>
+
+        <form id="quizForm">
+            <!-- 题1-12 全部使用完整选项描述，不显示维度标签 -->
+            <!-- 题1 -->
+            <div class="question-item">
+                <div class="question-text">1. 我能够清晰阐述数字技术对教育数字化转型的推动作用。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q1" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q1" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q1" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q1" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q1" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题2 -->
+            <div class="question-item">
+                <div class="question-text">2. 我了解至少3种当前教育领域广泛应用的新兴数字技术（如AI、VR、大数据等）。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q2" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q2" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q2" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q2" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q2" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题3 -->
+            <div class="question-item">
+                <div class="question-text">3. 我意识到数字技术的应用可能带来新的教育公平问题（如城乡数字鸿沟）。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q3" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q3" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q3" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q3" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q3" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题4 -->
+            <div class="question-item">
+                <div class="question-text">4. 我能预见数字化教学可能引发的伦理风险（如学生隐私泄露、算法偏见等）。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q4" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q4" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q4" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q4" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q4" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题5 -->
+            <div class="question-item">
+                <div class="question-text">5. 我会主动关注教育技术类公众号、论坛或社区，获取最新工具和方法。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q5" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q5" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q5" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q5" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q5" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题6 -->
+            <div class="question-item">
+                <div class="question-text">6. 即使学校没有强制要求，我也愿意在教学中尝试使用新的数字工具。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q6" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q6" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q6" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q6" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q6" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题7 -->
+            <div class="question-item">
+                <div class="question-text">7. 我愿意花额外的时间去探索如何将数字技术更好地融入我的学科教学。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q7" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q7" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q7" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q7" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q7" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题8 -->
+            <div class="question-item">
+                <div class="question-text">8. 我愿意与他人分享我在数字化教学实践中的经验和心得。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q8" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q8" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q8" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q8" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q8" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题9 -->
+            <div class="question-item">
+                <div class="question-text">9. 当我在教学中使用数字工具遇到技术故障时，我会尝试多种方法解决问题，而不是轻易放弃。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q9" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q9" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q9" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q9" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q9" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题10 -->
+            <div class="question-item">
+                <div class="question-text">10. 即使第一次尝试数字化教学的效果不理想，我仍然愿意继续改进并再次尝试。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q10" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q10" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q10" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q10" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q10" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题11 -->
+            <div class="question-item">
+                <div class="question-text">11. 当身边同事对数字化教学持怀疑态度时，我仍能坚持自己的实践探索。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q11" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q11" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q11" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q11" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q11" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+            <!-- 题12 -->
+            <div class="question-item">
+                <div class="question-text">12. 我愿意花较长时间（如一个学期）去跟踪和实践一项新的数字化教学策略，直到看到成效。<span class="required-star">*</span></div>
+                <div class="options">
+                    <label class="option-label"><input type="radio" name="q12" value="1"> 1分：完全不符合</label>
+                    <label class="option-label"><input type="radio" name="q12" value="2"> 2分：基本不符合</label>
+                    <label class="option-label"><input type="radio" name="q12" value="3"> 3分：部分符合</label>
+                    <label class="option-label"><input type="radio" name="q12" value="4"> 4分：基本符合</label>
+                    <label class="option-label"><input type="radio" name="q12" value="5"> 5分：完全符合</label>
+                </div>
+            </div>
+
+            <!-- 情境题1：完整描述 -->
+            <div class="sit-row">
+                <span class="sit-text">📌 情境1：新工具推广</span>
+                <div class="sit-options">
+                    <label class="option-label"><input type="radio" name="sit1" value="A"> A. 太复杂了，没时间研究，还是继续用原来的方式上课。</label>
+                    <label class="option-label"><input type="radio" name="sit1" value="B"> B. 先放着，等以后学校再组织培训或者有同事用熟了再学。</label>
+                    <label class="option-label"><input type="radio" name="sit1" value="C"> C. 主动花时间研究，上网搜索教程，尝试在下一节课就用起来。</label>
+                </div>
+            </div>
+            <!-- 情境题2：完整描述 -->
+            <div class="sit-row">
+                <span class="sit-text">📌 情境2：课堂翻车</span>
+                <div class="sit-options">
+                    <label class="option-label"><input type="radio" name="sit2" value="A"> A. 觉得很受打击，以后再也不在公开课用这些“花哨”的技术了。</label>
+                    <label class="option-label"><input type="radio" name="sit2" value="B"> B. 立刻切换到备用的PPT继续上课，但心里对技术产生了阴影。</label>
+                    <label class="option-label"><input type="radio" name="sit2" value="C"> C. 安抚学生，快速切换到备用方案，课后认真排查原因，并计划下次再尝试。</label>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button type="button" class="btn" id="submitBtn">✨ 查看我的分组</button>
+                <button type="button" class="btn reset" id="resetBtn">🔄 重新填写</button>
+            </div>
+        </form>
+
+        <div id="resultArea" class="result-box" style="display: none;">
+            <div class="result-title">🎯 你的自测结果</div>
+            <div id="groupDisplay" class="group-badge">——</div>
+            <div class="scores-row" id="scoresDisplay">
+                <div class="score-item">认识分 <span id="recogScore" class="score-number">0.0</span></div>
+                <div class="score-item">意愿分 <span id="willScore" class="score-number">0.0</span></div>
+                <div class="score-item">意志分 <span id="volScore" class="score-number">0.0</span></div>
+            </div>
+            <div id="extraMessage" style="margin: 15px 0 5px; font-weight: 500; color: #1a465b;"></div>
+            <div class="footnote">
+                ⚡ 分组依据：取三个维度中得分最高的维度作为建议小组（若并列最高，按认识组 → 意愿组 → 意志组顺序取第一个）。<br>
+                课堂活动时请根据分组颜色就坐。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const submitBtn = document.getElementById('submitBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const resultArea = document.getElementById('resultArea');
+            const groupDisplay = document.getElementById('groupDisplay');
+            const recogSpan = document.getElementById('recogScore');
+            const willSpan = document.getElementById('willScore');
+            const volSpan = document.getElementById('volScore');
+            const extraMsg = document.getElementById('extraMessage');
+
+            function getRadiosValue() {
+                const q = {};
+                for (let i = 1; i <= 12; i++) {
+                    const radios = document.getElementsByName(`q${i}`);
+                    let selected = null;
+                    for (let r of radios) {
+                        if (r.checked) {
+                            selected = r.value;
+                            break;
+                        }
+                    }
+                    if (!selected) return null;
+                    q[`q${i}`] = parseInt(selected, 10);
+                }
+                // 情境题
+                const sit1Radios = document.getElementsByName('sit1');
+                let sit1Val = null;
+                for (let r of sit1Radios) if (r.checked) { sit1Val = r.value; break; }
+                if (!sit1Val) return null;
+
+                const sit2Radios = document.getElementsByName('sit2');
+                let sit2Val = null;
+                for (let r of sit2Radios) if (r.checked) { sit2Val = r.value; break; }
+                if (!sit2Val) return null;
+
+                const sitMap = { 'A': 1, 'B': 3, 'C': 5 };
+                const sit1Score = sitMap[sit1Val];
+                const sit2Score = sitMap[sit2Val];
+
+                return {
+                    q1: q.q1, q2: q.q2, q3: q.q3, q4: q.q4,
+                    q5: q.q5, q6: q.q6, q7: q.q7, q8: q.q8,
+                    q9: q.q9, q10: q.q10, q11: q.q11, q12: q.q12,
+                    sit1: sit1Score,
+                    sit2: sit2Score
+                };
+            }
+
+            function calculateGroup(scores) {
+                // 各维度平均
+                const recogAvg = (scores.q1 + scores.q2 + scores.q3 + scores.q4) / 4;
+                const willAvg = (scores.q5 + scores.q6 + scores.q7 + scores.q8 + scores.sit1) / 5;
+                const volAvg = (scores.q9 + scores.q10 + scores.q11 + scores.q12 + scores.sit2) / 5;
+
+                const recog = Math.round(recogAvg * 100) / 100;
+                const will = Math.round(willAvg * 100) / 100;
+                const vol = Math.round(volAvg * 100) / 100;
+
+                // 找出最高分维度，并列时优先顺序：认识 > 意愿 > 意志
+                let maxDim = '认识组';
+                let maxVal = recogAvg;
+                if (willAvg > maxVal) {
+                    maxDim = '意愿组';
+                    maxVal = willAvg;
+                }
+                if (volAvg > maxVal) {
+                    maxDim = '意志组';
+                    maxVal = volAvg;
+                }
+
+                let message = '';
+                if (maxDim === '认识组') {
+                    message = '📘 您的数字化认识得分最高，建议加入“认识组”，在课堂中分享您对技术趋势与伦理的见解。';
+                } else if (maxDim === '意愿组') {
+                    message = '💡 您的数字化意愿得分最高，建议加入“意愿组”，带动大家探索新工具的热情。';
+                } else if (maxDim === '意志组') {
+                    message = '⚡ 您的数字化意志得分最高，建议加入“意志组”，分享您坚持应对技术挑战的经验。';
+                }
+
+                return {
+                    recog,
+                    will,
+                    vol,
+                    group: maxDim,
+                    message
+                };
+            }
+
+            function displayResult() {
+                const scores = getRadiosValue();
+                if (!scores) {
+                    alert('请完成所有题目（含两个情境题）后再提交！');
+                    return;
+                }
+
+                const res = calculateGroup(scores);
+                recogSpan.textContent = res.recog.toFixed(1);
+                willSpan.textContent = res.will.toFixed(1);
+                volSpan.textContent = res.vol.toFixed(1);
+                groupDisplay.textContent = res.group;
+                extraMsg.textContent = res.message;
+
+                resultArea.style.display = 'block';
+                resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            function resetForm() {
+                const allRadios = document.querySelectorAll('input[type="radio"]');
+                allRadios.forEach(r => r.checked = false);
+                resultArea.style.display = 'none';
+            }
+
+            submitBtn.addEventListener('click', displayResult);
+            resetBtn.addEventListener('click', resetForm);
+        })();
+    </script>
+</body>
+</html>
