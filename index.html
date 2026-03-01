@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词消消乐 · 听音盲猜</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f9f3e8 0%, #ffe6ce 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 16px;
+            margin: 0;
+        }
+
+        .game-container {
+            max-width: 750px;
+            width: 100%;
+            background: rgba(255, 245, 235, 0.75);
+            backdrop-filter: blur(8px);
+            border-radius: 56px;
+            padding: 32px 24px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.15), 0 5px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: #4a2c1a;
+            text-shadow: 4px 4px 0 #ffba7a, 7px 7px 0 rgba(255, 180, 110, 0.3);
+            margin-top: 0;
+            margin-bottom: 16px;
+            word-break: keep-all;
+            transform: rotate(-0.5deg);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e5d5c0;
+            padding: 12px 22px;
+            border-radius: 60px;
+            margin: 10px 0 25px 0;
+            box-shadow: inset 0 2px 5px rgba(90, 50, 20, 0.1), 0 6px 0 #b29172;
+            border-bottom: 2px solid #ccb297;
+        }
+
+        .listening-badge {
+            background: #31241b;
+            color: #ffddb0;
+            padding: 8px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 0 #5f4a38;
+            min-width: 160px;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .listening-badge.active {
+            background: #4d3425;
+            color: #ffeac2;
+            box-shadow: 0 0 0 2px #f7b773;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            border: none;
+            background: #fdebd0;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #3d2b1b;
+            box-shadow: 0 5px 0 #b68f6b, 0 8px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.07s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ffdbb5;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #b68f6b, 0 5px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn.play {
+            background: #b3e0b0;
+            color: #1d4d1d;
+            box-shadow: 0 5px 0 #558b55;
+        }
+
+        .btn.reset {
+            background: #ffcfb0;
+            color: #742c2c;
+            box-shadow: 0 5px 0 #b15a4a;
+        }
+
+        .word-grid {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 25px 0 10px;
+            padding: 18px 10px;
+            background: #eddccb;
+            border-radius: 60px;
+            box-shadow: inset 0 0 0 2px #f9e9d9, inset 0 0 0 5px #cbb295, 0 12px 18px -8px rgba(70, 40, 20, 0.5);
+            min-height: 300px;
+        }
+
+        .word-button {
+            background: #fef6e8;
+            border: 3px solid #ffc491;
+            padding: 18px 6px;
+            border-radius: 50px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #482e1c;
+            box-shadow: 0 7px 0 #b0764a, 0 8px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.08s;
+            text-align: center;
+            line-height: 1.2;
+            word-break: break-word;
+            backdrop-filter: blur(4px);
+            letter-spacing: 0.5px;
+        }
+
+        .word-button:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #b0764a, 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .particle-layer {
+            position: relative;
+            grid-column: 1 / -1;
+            grid-row: 1 / -1;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffd966, #ff9f4b);
+            box-shadow: 0 0 10px #fbbc4e;
+            pointer-events: none;
+            opacity: 1;
+            transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.4s ease;
+            transform: translate(0, 0) scale(1);
+            will-change: transform, opacity;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #8b6e54;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>✨单词消消乐✨</h1>
+
+        <div class="status-bar">
+            <div class="listening-badge" id="listeningIndicator">🎧 待命</div>
+            <div class="action-buttons">
+                <button class="btn play" id="playBtn">🔊 播放</button>
+                <button class="btn reset" id="resetBtn">⟲ 重置</button>
+            </div>
+        </div>
+
+        <!-- 单词网格 -->
+        <div class="word-grid" id="wordGrid"></div>
+        <div class="footer">
+            <span>⭐ 点击任意单词直接消除 · 听音模式点错重读 ⭐</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // 单词表 (20个)
+            const WORD_LIST = [
+                "apple", "banana", "cat", "dog", "elephant", 
+                "fish", "girl", "boy", "house", "tree", 
+                "book", "pen", "pencil", "eraser", "ruler", 
+                "school", "teacher", "student", "red", "blue"
+            ];
+
+            // 当前期望匹配的单词 (听音模式激活时)
+            let expectedWord = null;
+
+            // 获取DOM元素
+            const grid = document.getElementById('wordGrid');
+            const listeningIndicator = document.getElementById('listeningIndicator');
+            const playBtn = document.getElementById('playBtn');
+            const resetBtn = document.getElementById('resetBtn');
+
+            // 语音合成函数
+            function speakWord(word) {
+                if (!word) return;
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                utterance.volume = 1;
+                window.speechSynthesis.speak(utterance);
+            }
+
+            // 更新听音栏样式和文本 (不显示具体单词)
+            function updateListeningDisplay() {
+                if (expectedWord) {
+                    listeningIndicator.textContent = '🎧 听音中...';
+                    listeningIndicator.classList.add('active');
+                } else {
+                    listeningIndicator.textContent = '🎧 待命';
+                    listeningIndicator.classList.remove('active');
+                }
+            }
+
+            // 重置听音状态
+            function clearListening() {
+                expectedWord = null;
+                updateListeningDisplay();
+            }
+
+            // 生成粒子爆炸效果
+            function createParticleExplosion(button) {
+                const parentRect = grid.getBoundingClientRect();
+                const buttonRect = button.getBoundingClientRect();
+                const centerX = buttonRect.left + buttonRect.width / 2 - parentRect.left;
+                const centerY = buttonRect.top + buttonRect.height / 2 - parentRect.top;
+
+                const particleCount = 18;
+                const particles = [];
+
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+
+                    const size = 6 + Math.floor(Math.random() * 12);
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+
+                    const hue = 20 + Math.random() * 30;
+                    const sat = 80 + Math.random() * 20;
+                    const light = 60 + Math.random() * 30;
+                    particle.style.background = `radial-gradient(circle, hsl(${hue}, ${sat}%, 80%), hsl(${hue}, ${sat}%, ${light}%))`;
+                    particle.style.boxShadow = `0 0 12px hsl(${hue}, 90%, 70%)`;
+
+                    particle.style.left = centerX + 'px';
+                    particle.style.top = centerY + 'px';
+                    particle.style.transform = 'translate(-50%, -50%) scale(1)';
+                    particle.style.opacity = '1';
+
+                    particles.push(particle);
+                    grid.appendChild(particle);
+                }
+
+                requestAnimationFrame(() => {
+                    particles.forEach(p => {
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = 60 + Math.random() * 100;
+                        const tx = Math.cos(angle) * distance;
+                        const ty = Math.sin(angle) * distance;
+                        const scale = 0.3 + Math.random() * 0.9;
+                        p.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${scale})`;
+                        p.style.opacity = '0';
+                    });
+                });
+
+                setTimeout(() => {
+                    particles.forEach(p => p.remove());
+                }, 600);
+            }
+
+            // 移除单词按钮并触发粒子
+            function removeWordButton(button) {
+                if (!button || !button.parentNode) return;
+                createParticleExplosion(button);
+                button.remove();
+            }
+
+            // 渲染网格
+            function renderGrid() {
+                const buttons = grid.querySelectorAll('.word-button');
+                buttons.forEach(btn => btn.remove());
+
+                WORD_LIST.forEach(word => {
+                    const btn = document.createElement('div');
+                    btn.className = 'word-button';
+                    btn.textContent = word;
+                    btn.setAttribute('data-word', word);
+                    grid.appendChild(btn);
+                });
+
+                clearListening(); // 重置听音状态
+            }
+
+            // 获取当前所有可见单词按钮
+            function getCurrentWordButtons() {
+                return Array.from(grid.querySelectorAll('.word-button'));
+            }
+
+            // 随机选择一个存在的单词
+            function getRandomExistingWord() {
+                const buttons = getCurrentWordButtons();
+                if (buttons.length === 0) return null;
+                const randomIndex = Math.floor(Math.random() * buttons.length);
+                return buttons[randomIndex].getAttribute('data-word');
+            }
+
+            // 播放按钮逻辑
+            function onPlay() {
+                const existingButtons = getCurrentWordButtons();
+                if (existingButtons.length === 0) {
+                    alert('🎉 所有单词都消失啦！点击重置继续玩~');
+                    return;
+                }
+
+                const randomWord = getRandomExistingWord();
+                if (!randomWord) return;
+
+                expectedWord = randomWord;
+                updateListeningDisplay();  // 显示“听音中...”
+                speakWord(randomWord);
+            }
+
+            // 重置按钮
+            function onReset() {
+                renderGrid();
+            }
+
+            // 处理单词点击
+            function handleGridClick(e) {
+                const button = e.target.closest('.word-button');
+                if (!button) return;
+
+                const word = button.getAttribute('data-word');
+
+                if (expectedWord !== null) {
+                    // 听音模式
+                    if (word === expectedWord) {
+                        // 正确
+                        removeWordButton(button);
+                        clearListening();  // 清除听音状态
+
+                        if (getCurrentWordButtons().length === 0) {
+                            setTimeout(() => alert('✨ 恭喜！所有单词消除完毕！'), 200);
+                        }
+                    } else {
+                        // 错误：重读当前期望单词
+                        if (expectedWord) {
+                            speakWord(expectedWord);
+                        }
+                        // 视觉反馈
+                        button.style.backgroundColor = '#ffe0d0';
+                        button.style.transition = 'background 0.2s';
+                        setTimeout(() => {
+                            button.style.backgroundColor = '';
+                        }, 200);
+                    }
+                } else {
+                    // 普通点击消除
+                    removeWordButton(button);
+                    if (getCurrentWordButtons().length === 0) {
+                        setTimeout(() => alert('🎈 单词消光光！点重置再来一局'), 200);
+                    }
+                }
+            }
+
+            // 初始化
+            function initGame() {
+                renderGrid();
+                grid.addEventListener('click', handleGridClick);
+                playBtn.addEventListener('click', onPlay);
+                resetBtn.addEventListener('click', onReset);
+            }
+
+            initGame();
+        })();
+    </script>
+</body>
+</html>
